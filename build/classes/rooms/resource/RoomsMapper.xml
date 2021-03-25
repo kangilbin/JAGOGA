@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="NOPATH">
+	<select id="roomsList" resultType="adminRoomsBean">
+		select * from rooms
+		order by
+		rooms_nm asc
+	</select>
+
+	<select id="roomsSearchName" resultType="adminRoomsBean">
+		select * FROM rooms
+		WHERE
+		upper(rooms_nm) LIKE '%'||upper('${searchString}')||'%'
+	</select>
+
+	<select id="roomsSearchContents" resultType="adminRoomsBean">
+		select * FROM rooms
+		WHERE (upper(rooms_intro) LIKE '%'||upper('${searchString}')||'%' OR
+		upper(rooms_contents) LIKE '%'||upper('${searchString}')||'%' OR
+		upper(rooms_info) LIKE '%'||upper('${searchString}')||'%')
+	</select>
+
+	<select id="roomsSearchDate" resultType="adminRoomsBean">
+		select * FROM rooms
+		WHERE
+		upper(rooms_date) LIKE '%'||upper('${searchString}')||'%'
+	</select>
+
+	<!-- ${searchName} upper(rooms_nm) LIKE '%'||upper('${searchString}')||'%' -->
+
+	<select id="roomsInfo" resultType="adminRoomsBean">
+		select * from rooms
+		where
+		rooms_nm =
+		#{rooms_nm}
+	</select>
+
+	<select id="nameCheck" resultType="string">
+		select rooms_nm from rooms
+		where rooms_nm =
+		#{rooms_nm}
+	</select>
+
+	<update id="roomsuUpdate">
+		update rooms
+		set
+		rooms_intro=#{rooms_intro},
+		rooms_contents=#{rooms_contents},
+		rooms_info=#{rooms_info},
+		rooms_amt=#{rooms_amt},
+		rooms_pay=#{rooms_pay}
+		where
+		rooms_nm=#{rooms_nm}
+	</update>
+
+	<insert id="roomsInsert">
+		insert into rooms
+		values(#{rooms_thumbnail},
+		#{rooms_nm}, #{rooms_intro},
+		#{rooms_contents}, #{rooms_info},
+		#{rooms_amt}, #{rooms_pay},
+		#{rooms_file}, sysdate)
+	</insert>
+
+	<delete id="roomsDelete">
+		delete from rooms where
+		rooms_nm = #{rooms_nm}
+	</delete>
+
+	<!--=============================================================user_Sql============================================================= -->
+	<select id="roomsListCount" resultType="int">
+		select count(*) from
+		rooms
+	</select>
+
+	<select id="roomsListCountDate" resultType="int">
+		select count(*) from
+		rooms where upper(rooms_date) LIKE '%'||upper('${searchName}')||'%'
+	</select>
+
+	<select id="roomsListCountContents" resultType="int">
+		select count(*)
+		from rooms WHERE (upper(rooms_intro) LIKE
+		'%'||upper('${searchName}')||'%' OR
+		upper(rooms_contents) LIKE
+		'%'||upper('${searchName}')||'%' OR
+		upper(rooms_info) LIKE
+		'%'||upper('${searchName}')||'%')
+	</select>
+
+	<select id="roomsListCountName" resultType="int">
+		select count(*) from
+		rooms Where upper(rooms_nm) LIKE '%'||upper('${searchName}')||'%'
+	</select>
+
+	<!-- 현재 안씀 -->
+	<select id="userRoomsList" resultType="userRoomsBean">
+	<![CDATA[
+		select * from (select
+		rownum rnum, rooms_thumbnail, rooms_nm, rooms_intro, rooms_contents,
+		rooms_info
+		, rooms_amt, rooms_pay, rooms_file, rooms_date from
+		(
+		select *
+		from rooms order by rooms_date desc
+		))
+		where rnum >= #{startrow} and rnum <= #{endrow}
+		]]>
+	</select>
+
+	<select id="userRoomsName" resultType="userRoomsBean">
+	<![CDATA[
+		select * from (select
+		rownum rnum, rooms_thumbnail, rooms_nm, rooms_intro, rooms_contents,
+		rooms_info
+		, rooms_amt, rooms_pay, rooms_file, rooms_date from
+		(
+		select *
+		from rooms Where upper(rooms_nm) LIKE '%'||upper('${searchName}')||'%'
+		))
+		where rnum >= #{startrow} and rnum <= #{endrow}
+		]]>
+	</select>
+
+	<select id="userRoomsContents" resultType="userRoomsBean">
+	<![CDATA[
+		select * from (select
+		rownum rnum, rooms_thumbnail, rooms_nm, rooms_intro, rooms_contents,
+		rooms_info
+		, rooms_amt, rooms_pay, rooms_file, rooms_date from
+		(
+		select *
+		from rooms WHERE (upper(rooms_intro) LIKE '%'||upper('${searchName}')||'%' OR
+		upper(rooms_contents) LIKE '%'||upper('${searchName}')||'%' OR
+		upper(rooms_info) LIKE '%'||upper('${searchName}')||'%')
+		))
+		where rnum >= #{startrow} and rnum <= #{endrow}
+		]]>
+	</select>
+
+	<select id="userRoomsDate" resultType="userRoomsBean">
+	<![CDATA[
+		select * from (select
+		rownum rnum, rooms_thumbnail, rooms_nm, rooms_intro, rooms_contents,
+		rooms_info
+		, rooms_amt, rooms_pay, rooms_file, rooms_date from
+		(
+		select *
+		from rooms where upper(rooms_date) LIKE '%'||upper('${searchName}')||'%'
+		))
+		where rnum >= #{startrow} and rnum <= #{endrow}
+		]]>
+	</select>
+
+	<select id="userRoomsInfo" resultType="userRoomsBean">
+		select * from rooms
+		where
+		rooms_nm =
+		#{rooms_nm}
+	</select>
+	
+	<select id="roomsNameList" resultType="userRoomsBean">
+		select rooms_nm from rooms
+	</select>
+	<select id="indexRanmdomList" resultType="userRoomsBean">
+	<![CDATA[
+		select * from  (select * from rooms order by dbms_random.value) 
+		where rownum <= 5]]>
+	</select>
+</mapper>

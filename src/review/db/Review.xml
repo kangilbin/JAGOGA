@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <mapper namespace="review.db.ReviewDAO">
+ 	<select id="listAll" resultType="review.db.ReviewBean">
+ 		SELECT * FROM REVIEW
+ 		ORDER BY ROOMS_NM DESC
+ 	</select>
+ 	<select id="listRecent" resultType="review.db.ReviewBean">
+ 	  SELECT REVIEW_ID,MEMBER_ID,ROOMS_NM,REVIEW_STAR_TT, REVIEW_CONTENT, REVIEW_FILE, REVIEW_DT 
+      FROM REVIEW
+      WHERE ROOMS_NM = #{rooms_nm} 
+ 	  ORDER BY REVIEW_DT DESC
+ 	</select>
+ 	<select id="listStarde" resultType="review.db.ReviewBean">
+      select * from review where rooms_nm = #{rooms_nm} ORDER BY review_star_tt desc
+ 	</select>
+ 	<select id="listStarac" resultType="review.db.ReviewBean">
+      select * from review where rooms_nm = #{rooms_nm} ORDER BY review_star_tt asc
+ 	</select>
+ 	<select id="listUser" resultType="review.db.ReviewBean">
+      select review_id, member_id, review_star_tt, review_content, review_file, review_dt from review where member_id = #{member_id}
+ 	</select>
+ 	<select id="selReviewID" resultType="review.db.ReviewBean">
+ 	  select * from review where review_id = #{review_id}
+ 	</select>
+ 	<select id="startAvg" resultType="float">
+ 	  select round(avg(review_star_tt),1) from review where rooms_nm = #{rooms_nm}
+ 	</select>
+ 	<select id="reviewCount" resultType="int">
+ 	  select count(*) from review where rooms_nm = #{rooms_nm} ORDER BY review_star_tt desc
+ 	</select>
+ 	<select id="userCount" resultType="int">
+ 		select count(*) from review where member_id = #{member_id}
+ 	</select>
+ 	<select id="reviewAllCount" resultType="int">
+ 		select count(*) from review
+ 	</select>
+ 	
+ 	<select id="listBest" resultType="review.db.ReviewBean">
+ 	   SELECT * FROM 
+ 	   (
+ 	   	SELECT * 
+ 	   	FROM REVIEW 
+ 	   	WHERE ROOMS_NM = #{rooms_nm} 
+ 	   	ORDER BY REVIEW_STAR_TT DESC
+ 	   ) 
+ 	   <![CDATA[where rownum <= 3]]>
+ 	</select>
+ 	<select id="listDel" resultType="review.db.ReviewBean">
+ 		SELECT * FROM
+			(SELECT ROWNUM as rownumber, REVIEW_ID, MEMBER_ID, ROOMS_NM, REVIEW_STAR_TT, REVIEW_CONTENT, REVIEW_FILE, REVIEW_DT FROM review ORDER BY rooms_nm ASC) a
+		<![CDATA[WHERE a.rownumber>=#{startrow} and a.rownumber<=#{endrow}]]>
+ 	</select>
+ 	<select id="listUser2" resultType="review.db.ReviewBean">
+ 		SELECT * FROM (SELECT ROWNUM as rownumber, REVIEW_ID, MEMBER_ID, ROOMS_NM, REVIEW_STAR_TT, REVIEW_CONTENT, REVIEW_FILE, REVIEW_DT FROM review where member_id=#{member_id} ORDER BY rooms_nm ASC) a <![CDATA[WHERE a.rownumber>=#{startrow} and a.rownumber<=#{endrow}]]>
+ 	</select>
+ 	<insert id="insert" parameterType="review.db.ReviewBean">
+ 	  insert into review (review_id,member_id,rooms_nm, review_star_tt ,review_content ,review_file ,review_dt)
+ 	  values (SEQ_REVIEW_ID.NEXTVAL ,#{member_id},#{rooms_nm}, #{review_star_tt}, #{review_content}, #{review_file} ,SYSDATE)
+ 	</insert>
+ 	<insert id="insert2" parameterType="review.db.ReviewBean">
+  	  insert into review (review_id, member_id, rooms_nm, review_star_tt, review_content, review_dt)
+ 	  values (SEQ_REVIEW_ID.NEXTVAL ,#{member_id},#{rooms_nm}, #{review_star_tt}, #{review_content}, SYSDATE)	
+ 	</insert>
+ 	<delete id="delReview">
+ 		DELETE
+ 		FROM REVIEW
+ 		WHERE REVIEW_ID = #{review_id}
+ 	</delete>
+ 	<update  id="reviewUpdate" parameterType="review.db.ReviewBean">
+ 		UPDATE REVIEW
+ 		SET ROOMS_NM = #{rooms_nm},
+ 			REVIEW_STAR_TT = #{review_star_tt},
+ 			REVIEW_CONTENT = #{review_content},
+ 			REVIEW_FILE = #{review_file}
+ 		WHERE REVIEW_ID = #{review_id}
+ 	</update>
+ 	<update  id="reviewUpdate2" parameterType="review.db.ReviewBean">
+ 		UPDATE REVIEW
+ 		SET ROOMS_NM = #{rooms_nm},
+ 			REVIEW_STAR_TT = #{review_star_tt},
+ 			REVIEW_CONTENT = #{review_content}
+ 		WHERE REVIEW_ID = #{review_id}  
+ 	</update>
+ </mapper>
